@@ -1,0 +1,21 @@
+name: Deploy Static Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Deploy HTML + CSS
+        run: |
+          echo "Starting Static Site Deployment"
+          mkdir -p /tmp/static-site
+          cp index.html styles.css /tmp/static-site/
+          echo "Files copied to /tmp/static-site"
