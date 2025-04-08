@@ -1,4 +1,4 @@
-name: Deploy Static Website
+name: CI/CD for HTML CSS Page
 
 on:
   push:
@@ -6,16 +6,34 @@ on:
       - main
 
 jobs:
-  deploy:
+  # Build Job
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Deploy HTML + CSS
-        run: |
-          echo "Starting Static Site Deployment"
-          mkdir -p /tmp/static-site
-          cp index.html styles.css /tmp/static-site/
-          echo "Files copied to /tmp/static-site"
+      - name: Upload artifact (HTML + CSS)
+        uses: actions/upload-artifact@v3
+        with:
+          name: site-files
+          path: |
+            index.html
+            styles.css
+
+  # Deploy Job
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: site-files
+          path: ./site
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Use the default GitHub token
+          publish_dir: ./site
